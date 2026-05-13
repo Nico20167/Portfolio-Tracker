@@ -73,7 +73,7 @@ L'outil sera disponible à `https://votre-compte.github.io/nom-du-repo`.
 
 ### Backend
 
-Voir le repo [`portfolio-api`](https://github.com/votre-compte/portfolio-api) pour les instructions de déploiement du backend FastAPI.
+Voir le repo [portfolio-tracker-api](https://github.com/Nico20167/portfolio-tracker-api/) pour les instructions de déploiement du backend FastAPI.
 
 ---
 
