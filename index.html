@@ -114,6 +114,34 @@
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
   .loading { animation: pulse 1.5s ease-in-out infinite; }
 
+  /* ── Mobile ── */
+  .hamburger {
+    display: none; position: fixed; top: 14px; left: 14px; z-index: 300;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 10px; cursor: pointer; color: var(--text); font-size: 18px; line-height: 1;
+  }
+  .sidebar-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55); z-index: 240;
+  }
+  @media (max-width: 768px) {
+    .shell { grid-template-columns: 1fr; }
+    aside {
+      position: fixed; left: 0; top: 0; bottom: 0; height: 100vh; z-index: 250;
+      transform: translateX(-100%); transition: transform 0.25s ease;
+    }
+    aside.open {
+      transform: translateX(0);
+      box-shadow: 6px 0 24px rgba(0,0,0,0.5);
+    }
+    .sidebar-overlay.open { display: block; }
+    main { padding: 64px 16px 24px; }
+    .hamburger { display: flex; }
+    .two-col { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+    .modal { padding: 20px; }
+  }
+
   /* ── Modal ── */
   .modal-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
@@ -183,10 +211,13 @@
 </style>
 </head>
 <body>
+<button class="hamburger" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+<div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
 <div class="shell">
 
 <!-- ── Sidebar ── -->
-<aside>
+<aside id="sidebar">
   <div class="logo"><span>◈</span> Portfolio</div>
   <nav>
     <a class="active" onclick="show('import')">
@@ -610,6 +641,7 @@ function show(id) {
   if (id === 'evolution'   && !evolutionLoaded)   loadEvolution();
   if (id === 'allocation'  && !allocationLoaded)  loadAllocation();
   if (id === 'projection'  && !projectionLoaded)  loadProjection();
+  closeSidebarOnMobile();
 }
 
 // ── State flags ──────────────────────────────────────────────────────────────
@@ -1404,6 +1436,19 @@ async function loadModalChart(period) {
       }
     }
   });
+}
+
+// ── Mobile sidebar ───────────────────────────────────────────────────────────
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open');
+}
+
+function closeSidebarOnMobile() {
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').classList.remove('open');
+  }
 }
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
