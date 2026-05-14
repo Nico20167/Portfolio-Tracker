@@ -1575,8 +1575,29 @@ function closeSidebarOnMobile() {
   }
 }
 
+// ── Server warmup & keep-alive ───────────────────────────────────────────────
+async function warmupServer() {
+  let warned = false;
+  const warnTimer = setTimeout(() => {
+    warned = true;
+    log.classList.add('visible');
+    logLine('⏳ Réveil du serveur (~30s)… Merci de patienter.');
+  }, 2000);
+  try {
+    await fetch(`${API}/ping`);
+  } catch(e) {}
+  finally {
+    clearTimeout(warnTimer);
+    if (warned) logLine('✓ Serveur prêt.', 'log-ok');
+  }
+}
+
+// Keep server alive every 10 min while tab is open
+setInterval(() => fetch(`${API}/ping`).catch(() => {}), 10 * 60 * 1000);
+
 // ── Boot ──────────────────────────────────────────────────────────────────────
 loadPortfolio();
+warmupServer();
 if (PORT.transactions.length) {
   recompute().then(() => show('overview'));
 } else {
