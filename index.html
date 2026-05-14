@@ -64,9 +64,11 @@
   .chart-wrap-sm { position: relative; height: 200px; }
 
   /* ── Table ── */
+  .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { text-align: left; padding: 8px 12px; color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
-  td { padding: 12px 12px; border-bottom: 1px solid rgba(46,49,72,0.5); }
+  th { text-align: left; padding: 8px 12px; color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 12px 12px; border-bottom: 1px solid rgba(46,49,72,0.5); white-space: nowrap; }
+  td.col-name { white-space: normal; min-width: 140px; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: rgba(255,255,255,0.02); }
   .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(108,142,245,0.12); color: var(--accent); }
@@ -140,6 +142,11 @@
     .two-col { grid-template-columns: 1fr; }
     .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
     .modal { padding: 20px; }
+    .col-compte { display: none; }
+    table { font-size: 12px; }
+    th { padding: 7px 8px; }
+    td { padding: 10px 8px; }
+    td.col-name { min-width: 120px; }
   }
 
   /* ── Modal ── */
@@ -291,22 +298,24 @@
     <p>Détail de chaque ligne du portefeuille</p>
   </div>
   <div class="card">
-    <table>
-      <thead>
-        <tr>
-          <th>Nom</th>
-          <th>Compte</th>
-          <th>Parts</th>
-          <th>Investi</th>
-          <th>Valeur actuelle</th>
-          <th>+/- (€)</th>
-          <th>+/- (%)</th>
-        </tr>
-      </thead>
-      <tbody id="positions-tbody">
-        <tr><td colspan="7" class="loading">Chargement…</td></tr>
-      </tbody>
-    </table>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th class="col-compte">Compte</th>
+            <th>Parts</th>
+            <th>Investi</th>
+            <th>Valeur actuelle</th>
+            <th>+/- (€)</th>
+            <th>+/- (%)</th>
+          </tr>
+        </thead>
+        <tbody id="positions-tbody">
+          <tr><td colspan="7" class="loading">Chargement…</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </section>
 
@@ -325,9 +334,25 @@
     <div class="chart-wrap"><canvas id="chart-evol-total"></canvas></div>
   </div>
   <div class="card">
-    <div class="card-title">Par ETF</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div class="card-title" style="margin-bottom:0">Par ETF — cours</div>
+      <div class="period-tabs" id="etf-period-tabs" style="margin-bottom:0">
+        <button class="period-tab" data-period="3m"  onclick="switchEtfPeriod('3m')">3M</button>
+        <button class="period-tab" data-period="6m"  onclick="switchEtfPeriod('6m')">6M</button>
+        <button class="period-tab active" data-period="1y" onclick="switchEtfPeriod('1y')">1A</button>
+        <button class="period-tab" data-period="all" onclick="switchEtfPeriod('all')">Max</button>
+      </div>
+    </div>
     <div class="etf-tabs" id="etf-tabs"></div>
     <div class="chart-wrap"><canvas id="chart-evol-etf"></canvas></div>
+    <div style="display:flex;gap:24px;margin-top:14px;justify-content:center">
+      <span style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px">
+        <svg width="22" height="4" style="flex-shrink:0"><line x1="0" y1="2" x2="22" y2="2" stroke="#4ecfb3" stroke-width="2.5"/></svg>Cours ETF
+      </span>
+      <span style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px">
+        <span style="color:#4ecfb3;font-size:14px;margin-right:4px">▲</span>Achat
+      </span>
+    </div>
   </div>
 </section>
 
@@ -815,11 +840,11 @@ async function loadPositions() {
 
   tbody.innerHTML = positionsData.map(p => `
     <tr class="${p.asset_class === 'FUND' ? 'clickable' : ''}" ${p.asset_class === 'FUND' ? `onclick="openEtfModal('${p.isin}')"` : ''}>
-      <td>
+      <td class="col-name">
         <div style="font-weight:500">${p.name}</div>
         <div style="color:var(--muted);font-size:11px;font-family:'DM Mono',monospace">${p.isin}</div>
       </td>
-      <td><span class="tag ${p.account_type === 'PEA' ? 'pea' : ''}">${p.account_type}</span></td>
+      <td class="col-compte"><span class="tag ${p.account_type === 'PEA' ? 'pea' : ''}">${p.account_type}</span></td>
       <td class="mono">${p.shares}</td>
       <td class="mono">${fmtEur(p.total_invested)}</td>
       <td class="mono">${fmtEur(p.current_value)}</td>
@@ -832,9 +857,11 @@ async function loadPositions() {
 }
 
 // ── Evolution ─────────────────────────────────────────────────────────────────
-let _evolAbsData  = null;   // raw portfolio evolution
-let _benchData    = null;   // normalized benchmark data
-let evolBenchMode = false;
+let _evolAbsData    = null;   // raw portfolio evolution
+let _benchData      = null;   // normalized benchmark data
+let evolBenchMode   = false;
+let _currentEtfIsin = null;
+let _currentEtfPeriod = '1y';
 
 async function loadEvolution() {
   if (!ANALYTICS) { evolutionLoaded = true; return; }
@@ -1034,23 +1061,109 @@ function renderProjectionChart(current, monthly, years) {
 }
 
 async function loadEtfChart(isin, btn) {
+  _currentEtfIsin = isin;
   document.querySelectorAll('.etf-tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  const result = await postWithPortfolio(`compute/etf?isin=${isin}`);
-  const data = result.evolution || [];
+  if (btn) btn.classList.add('active');
+  await renderEtfPriceChart(isin, _currentEtfPeriod);
+}
+
+async function switchEtfPeriod(period) {
+  _currentEtfPeriod = period;
+  document.querySelectorAll('#etf-period-tabs .period-tab').forEach(b =>
+    b.classList.toggle('active', b.dataset.period === period)
+  );
+  if (_currentEtfIsin) await renderEtfPriceChart(_currentEtfIsin, period);
+}
+
+async function renderEtfPriceChart(isin, period) {
   const ctx = document.getElementById('chart-evol-etf').getContext('2d');
-  if (charts.evolEtf) charts.evolEtf.destroy();
+  if (charts.evolEtf) { charts.evolEtf.destroy(); charts.evolEtf = null; }
+
+  const priceData = await postWithPortfolio(`compute/price?isin=${isin}&period=${period}`);
+
+  if (!priceData.length) {
+    ctx.canvas.parentNode.innerHTML =
+      '<div class="empty"><p>Aucun historique de prix disponible.</p></div>';
+    return;
+  }
+
+  const labels = priceData.map(d => d.date);
+  const priceLookup = {};
+  priceData.forEach(d => { priceLookup[d.date] = d.close; });
+
+  const txsForIsin = PORT.transactions.filter(t => t.isin === isin && t.type === 'BUY');
+  const buysByLabel = {};
+  txsForIsin.forEach(tx => {
+    if (tx.date < labels[0]) return;
+    let best = null, bestDiff = Infinity;
+    for (const l of labels) {
+      const diff = Math.abs(new Date(l) - new Date(tx.date));
+      if (diff < bestDiff) { bestDiff = diff; best = l; }
+    }
+    if (!best) return;
+    if (!buysByLabel[best]) buysByLabel[best] = { shares: 0, amount: 0, count: 0 };
+    buysByLabel[best].shares += tx.shares;
+    buysByLabel[best].amount += tx.amount;
+    buysByLabel[best].count++;
+  });
+
+  const buyMarkerData = labels.map(l => buysByLabel[l] ? priceLookup[l] : null);
+
   charts.evolEtf = new Chart(ctx, {
-    type: 'line',
     data: {
-      labels: data.map(d => d.date),
-      datasets: [{
-        data: data.map(d => d.value),
-        borderColor: '#4ecfb3', backgroundColor: 'rgba(78,207,179,0.08)',
-        fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2
-      }]
+      labels,
+      datasets: [
+        {
+          type: 'line',
+          label: 'Cours ETF',
+          data: priceData.map(d => d.close),
+          borderColor: '#4ecfb3', backgroundColor: 'rgba(78,207,179,0.08)',
+          fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2, order: 2,
+        },
+        {
+          type: 'line',
+          label: 'Achats',
+          data: buyMarkerData,
+          showLine: false, spanGaps: false,
+          pointStyle: labels.map(l => buysByLabel[l] ? 'triangle' : 'circle'),
+          pointRadius: labels.map(l => buysByLabel[l] ? 9 : 0),
+          pointHoverRadius: labels.map(l => buysByLabel[l] ? 12 : 0),
+          pointBackgroundColor: '#4ecfb3',
+          pointBorderColor: 'transparent',
+          order: 1,
+        },
+      ]
     },
-    options: lineOptions()
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a1d27', borderColor: '#2e3148', borderWidth: 1,
+          titleColor: '#e8eaf0', bodyColor: '#7b8099',
+          filter: item => item.parsed.y != null,
+          callbacks: {
+            title: items => items[0].label,
+            label: item => {
+              if (item.datasetIndex === 1) {
+                const b = buysByLabel[item.label];
+                if (!b) return null;
+                return [
+                  ` ▲ Achat${b.count > 1 ? 's (' + b.count + ')' : ''} — ${b.shares.toFixed(4)} parts`,
+                  `   Prix moy. : ${fmt(b.amount / b.shares, 2)} €   Investi : ${fmt(b.amount, 2)} €`,
+                ];
+              }
+              return ` Cours : ${fmt(item.parsed.y, 2)} €`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(46,49,72,0.5)' }, ticks: { maxTicksLimit: 8 } },
+        y: { grid: { color: 'rgba(46,49,72,0.5)' }, ticks: { callback: v => fmt(v, 2) + ' €' } }
+      }
+    }
   });
 }
 
@@ -1324,7 +1437,7 @@ async function openEtfModal(isin) {
   }
 
   // Reset period tabs to 1y
-  document.querySelectorAll('.period-tab').forEach(b =>
+  document.querySelectorAll('#modal-period-tabs .period-tab').forEach(b =>
     b.classList.toggle('active', b.dataset.period === '1y')
   );
 
@@ -1338,7 +1451,7 @@ async function openEtfModal(isin) {
 
 async function loadModalChart(period) {
   // Highlight selected period tab
-  document.querySelectorAll('.period-tab').forEach(b =>
+  document.querySelectorAll('#modal-period-tabs .period-tab').forEach(b =>
     b.classList.toggle('active', b.dataset.period === period)
   );
 
