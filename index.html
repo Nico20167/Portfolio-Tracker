@@ -583,7 +583,7 @@ async function refresh() {
   await recompute();
   overviewLoaded = positionsLoaded = evolutionLoaded = allocationLoaded = false;
   _benchData = null; _evolAbsData = null;
-  loadOverview();
+  await loadOverview();
 }
 
 // ── Palette ──────────────────────────────────────────────────────────────────
@@ -1292,6 +1292,7 @@ async function _runEnrichAll() {
 async function doImport() {
   const file = fileInput.files[0];
   if (!file) return;
+  _importing = true;
   log.innerHTML = ''; log.classList.add('visible');
   btnImport.disabled = true;
   logLine(`Lecture du fichier ${file.name}…`);
@@ -1340,6 +1341,7 @@ async function doImport() {
   } catch(e) {
     logLine('✗ Erreur : ' + e.message, 'log-err');
   } finally {
+    _importing = false;
     btnImport.disabled = false;
     btnImport.textContent = 'Importer';
   }
@@ -1576,9 +1578,12 @@ function closeSidebarOnMobile() {
 }
 
 // ── Server warmup & keep-alive ───────────────────────────────────────────────
+let _importing = false;
+
 async function warmupServer() {
   let warned = false;
   const warnTimer = setTimeout(() => {
+    if (_importing) return;
     warned = true;
     log.classList.add('visible');
     logLine('⏳ Réveil du serveur (~30s)… Merci de patienter.');
@@ -1588,7 +1593,7 @@ async function warmupServer() {
   } catch(e) {}
   finally {
     clearTimeout(warnTimer);
-    if (warned) logLine('✓ Serveur prêt.', 'log-ok');
+    if (warned && !_importing) logLine('✓ Serveur prêt.', 'log-ok');
   }
 }
 
