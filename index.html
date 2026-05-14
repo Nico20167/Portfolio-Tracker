@@ -86,6 +86,7 @@
   .btn { display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; font-family: var(--font); cursor: pointer; transition: opacity 0.15s; border: none; }
   .btn-primary { background: var(--accent); color: #fff; }
   .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+  .btn-danger { background: transparent; color: var(--loss); border: 1px solid rgba(248,113,113,0.35); }
   .btn:hover { opacity: 0.85; }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; }
   .status-log { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); max-height: 160px; overflow-y: auto; margin-top: 16px; display: none; }
@@ -473,7 +474,7 @@
         <div style="background:var(--accent2);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">4</div>
         <div>
           <div style="font-size:13px;font-weight:500">Importe le fichier ci-dessous</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px">Puis clique sur <strong style="color:var(--text)">"Actualiser données ETF"</strong> pour charger les prix et la répartition (~30s)</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">Le bouton <strong style="color:var(--text)">"Importer"</strong> parse le CSV et charge automatiquement les prix et la répartition (~30s par ETF)</div>
         </div>
       </div>
     </div>
@@ -488,9 +489,9 @@
       <div class="upload-title">Glisse ton CSV ici</div>
       <div class="upload-sub">ou clique pour choisir un fichier</div>
     </label>
-    <div style="display:flex; gap:12px; margin-top:16px; align-items:center;">
+    <div style="display:flex; gap:12px; margin-top:16px; align-items:center; flex-wrap:wrap;">
       <button class="btn btn-primary" id="btn-import" disabled onclick="doImport()">Importer</button>
-      <button class="btn btn-outline" id="btn-enrich" onclick="doEnrich()">Actualiser données ETF</button>
+      <button class="btn btn-danger" onclick="doReset()">Réinitialiser</button>
       <span id="selected-file" style="color:var(--muted);font-size:12px;"></span>
     </div>
     <div class="status-log" id="status-log"></div>
@@ -1248,6 +1249,46 @@ function logLine(msg, cls = '') {
   log.scrollTop = log.scrollHeight;
 }
 
+async function _runEnrichAll() {
+  const fundTxs = PORT.transactions.filter(t => t.asset_class === 'FUND');
+  const seen = new Set();
+  const toEnrich = [];
+  fundTxs.forEach(t => {
+    if (!seen.has(t.isin)) { seen.add(t.isin); toEnrich.push({ isin: t.isin, name: t.name }); }
+  });
+  if (!toEnrich.length) return;
+
+  const since = fundTxs.map(t => t.date).sort()[0] || '2020-01-01';
+  logLine(`Enrichissement de ${toEnrich.length} ETF(s) depuis ${since}…`);
+
+  for (const { isin, name } of toEnrich) {
+    logLine(`⋯ ${name} (${isin})…`);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 120000);
+    try {
+      const res = await fetch(`${API}/enrich-isin`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isin, name, since }),
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+      const data = await res.json();
+      PORT.metadata[isin] = data.metadata;
+      PORT.prices[isin]   = data.prices;
+      const geo = Object.keys(data.metadata?.geo_data || {}).length;
+      const pts = data.prices?.length || 0;
+      logLine(`  ✓ geo: ${geo} pays · ${pts} prix`, 'log-ok');
+    } catch(e) {
+      clearTimeout(timer);
+      const msg = e.name === 'AbortError' ? 'Timeout 120s dépassé' : e.message;
+      logLine(`  ✗ ${msg}`, 'log-err');
+    }
+  }
+  savePortfolio();
+}
+
 async function doImport() {
   const file = fileInput.files[0];
   if (!file) return;
@@ -1272,80 +1313,50 @@ async function doImport() {
     const newTxs = (data.transactions || []).filter(t => !existingIds.has(t.id));
 
     if (newTxs.length === 0) {
-      logLine(`ℹ ${data.transactions?.length || 0} transaction(s) déjà présentes — aucune nouveauté.`);
-    } else {
-      PORT.transactions.push(...newTxs);
-      savePortfolio();
-
-      logLine(`✓ ${newTxs.length} transaction(s) importée(s)`, 'log-ok');
-      const byIsin = {};
-      newTxs.forEach(t => {
-        if (!byIsin[t.isin]) byIsin[t.isin] = { name: t.name, asset_class: t.asset_class, count: 0 };
-        byIsin[t.isin].count++;
-      });
-      Object.values(byIsin).forEach(info =>
-        logLine(`  + ${info.count}× [${info.asset_class}] ${info.name}`, 'log-ok')
-      );
-      logLine('→ Clique sur "Actualiser données ETF" pour récupérer les prix et la répartition.');
-      await refresh();
+      logLine(`ℹ Aucune nouvelle transaction — données déjà à jour.`);
+      if (PORT.transactions.length) show('overview');
+      return;
     }
+
+    PORT.transactions.push(...newTxs);
+    savePortfolio();
+
+    logLine(`✓ ${newTxs.length} transaction(s) importée(s)`, 'log-ok');
+    const byIsin = {};
+    newTxs.forEach(t => {
+      if (!byIsin[t.isin]) byIsin[t.isin] = { name: t.name, asset_class: t.asset_class, count: 0 };
+      byIsin[t.isin].count++;
+    });
+    Object.values(byIsin).forEach(info =>
+      logLine(`  + ${info.count}× [${info.asset_class}] ${info.name}`, 'log-ok')
+    );
+
+    btnImport.textContent = 'Enrichissement…';
+    await _runEnrichAll();
+    logLine('Calcul des analytics…');
+    await refresh();
+    logLine('✓ Terminé.', 'log-ok');
+    show('overview');
   } catch(e) {
-    logLine('✗ Erreur import : ' + e.message, 'log-err');
+    logLine('✗ Erreur : ' + e.message, 'log-err');
+  } finally {
+    btnImport.disabled = false;
+    btnImport.textContent = 'Importer';
   }
-  btnImport.disabled = false;
 }
 
-async function doEnrich() {
-  log.innerHTML = ''; log.classList.add('visible');
-  const btn = document.getElementById('btn-enrich');
-  btn.disabled = true;
-
-  const fundTxs = PORT.transactions.filter(t => t.asset_class === 'FUND');
-  const seen = new Set();
-  const toEnrich = [];
-  fundTxs.forEach(t => {
-    if (!seen.has(t.isin)) { seen.add(t.isin); toEnrich.push({ isin: t.isin, name: t.name }); }
-  });
-
-  if (!toEnrich.length) {
-    logLine('Aucun ETF trouvé. Importe d\'abord un CSV.', 'log-err');
-    btn.disabled = false; return;
-  }
-
-  const since = fundTxs.map(t => t.date).sort()[0] || '2020-01-01';
-  logLine(`Enrichissement de ${toEnrich.length} ETF(s) depuis ${since}…`);
-
-  for (const { isin, name } of toEnrich) {
-    logLine(`⋯ ${name} (${isin})…`);
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 120000); // 120s max par ETF
-    try {
-      const res = await fetch(`${API}/enrich-isin`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isin, name, since }),
-        signal: controller.signal,
-      });
-      clearTimeout(timer);
-      if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
-      const data = await res.json();
-      PORT.metadata[isin] = data.metadata;
-      PORT.prices[isin]   = data.prices;
-      const geo = Object.keys(data.metadata?.geo_data || {}).length;
-      const pts = data.prices?.length || 0;
-      logLine(`  ✓ geo: ${geo} pays · ${pts} prix`, 'log-ok');
-    } catch(e) {
-      clearTimeout(timer);
-      const msg = e.name === 'AbortError' ? 'Timeout 120s depasse' : e.message;
-      logLine(`  ✗ ${msg}`, 'log-err');
-    }
-  }
-
-  savePortfolio();
-  logLine('Calcul des analytics…');
-  await refresh();
-  logLine('✓ Terminé.', 'log-ok');
-  btn.disabled = false;
+function doReset() {
+  if (!confirm('Effacer toutes les données en cache ?\nCette action est irréversible.')) return;
+  localStorage.removeItem('portfolio_v1');
+  Object.assign(PORT, { transactions: [], prices: {}, metadata: {} });
+  ANALYTICS = null;
+  overviewLoaded = positionsLoaded = evolutionLoaded = allocationLoaded = projectionLoaded = false;
+  _benchData = null; _evolAbsData = null; _currentEtfIsin = null; _currentEtfPeriod = '1y';
+  log.innerHTML = ''; log.classList.remove('visible');
+  document.getElementById('selected-file').textContent = '';
+  fileInput.value = '';
+  btnImport.disabled = true;
+  logLine('✓ Données effacées — tu peux importer un nouveau CSV.', 'log-ok');
 }
 
 // ── Allocation Detail Modal ───────────────────────────────────────────────────
