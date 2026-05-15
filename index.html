@@ -33,6 +33,9 @@
 
   /* ── Sidebar ── */
   .logo { padding: 0 20px 24px; font-size: 17px; font-weight: 600; letter-spacing: -0.3px; color: var(--text); display: flex; align-items: center; gap: 10px; }
+  .lang-btn { background: none; border: none; cursor: pointer; font-size: 18px; line-height: 1; padding: 0; transition: opacity 0.15s; }
+  .lang-btn.active { opacity: 1; }
+  .lang-btn.inactive { opacity: 0.35; }
   .logo span { color: var(--accent); font-size: 22px; }
   nav a { display: flex; align-items: center; gap: 10px; padding: 9px 20px; color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 500; border-radius: 0; transition: color 0.15s, background 0.15s; cursor: pointer; }
   nav a:hover { color: var(--text); background: var(--surface2); }
@@ -226,31 +229,36 @@
 
 <!-- ── Sidebar ── -->
 <aside id="sidebar">
-  <div class="logo"><span>◈</span> Portfolio</div>
+  <div class="logo"><span>◈</span> Portfolio
+    <div style="margin-left:auto;display:flex;gap:4px;align-items:center">
+      <button class="lang-btn active" id="flag-fr" onclick="setLang('fr')" title="Français">🇫🇷</button>
+      <button class="lang-btn inactive" id="flag-en" onclick="setLang('en')" title="English">🇬🇧</button>
+    </div>
+  </div>
   <nav>
     <a class="active" onclick="show('import')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      Accueil
+      <span data-i18n="nav_home">Accueil</span>
     </a>
     <a onclick="show('overview')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Vue d'ensemble
+      <span data-i18n="nav_overview">Vue d'ensemble</span>
     </a>
     <a onclick="show('positions')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-      Positions
+      <span data-i18n="nav_positions">Positions</span>
     </a>
     <a onclick="show('evolution')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      Évolution
+      <span data-i18n="nav_evolution">Évolution</span>
     </a>
     <a onclick="show('allocation')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10H12V2z"/></svg>
-      Répartition
+      <span data-i18n="nav_allocation">Répartition</span>
     </a>
     <a onclick="show('projection')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-      Projection
+      <span data-i18n="nav_projection">Projection</span>
     </a>
   </nav>
 </aside>
@@ -261,7 +269,7 @@
 <!-- ══ OVERVIEW ══ -->
 <section id="overview">
   <div class="page-header">
-    <h1>Vue d'ensemble</h1>
+    <h1 data-i18n="overview_title">Vue d'ensemble</h1>
     <p id="overview-date" class="muted"></p>
   </div>
   <div class="kpi-grid" id="kpi-grid">
@@ -271,7 +279,7 @@
 
   <div class="card" id="perf-card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
-      <div class="card-title" style="margin-bottom:0">Performance de la période</div>
+      <div class="card-title" style="margin-bottom:0" data-i18n="perf_card_title">Performance de la période</div>
       <div class="period-tabs" id="perf-tabs" style="margin-bottom:0">
         <button class="period-tab" data-period="1m"  onclick="loadPerformance('1m')">1M</button>
         <button class="period-tab" data-period="mtd" onclick="loadPerformance('mtd')">MTD</button>
@@ -283,11 +291,11 @@
   </div>
 
   <div class="card">
-    <div class="card-title">Évolution du portefeuille</div>
+    <div class="card-title" data-i18n="evol_chart_title">Évolution du portefeuille</div>
     <div class="chart-wrap"><canvas id="chart-evolution"></canvas></div>
   </div>
   <div class="card">
-    <div class="card-title">Investissements mensuels</div>
+    <div class="card-title" data-i18n="monthly_chart_title">Investissements mensuels</div>
     <div class="chart-wrap-sm"><canvas id="chart-monthly"></canvas></div>
   </div>
 </section>
@@ -295,19 +303,19 @@
 <!-- ══ POSITIONS ══ -->
 <section id="positions">
   <div class="page-header">
-    <h1>Positions</h1>
-    <p>Détail de chaque ligne du portefeuille</p>
+    <h1 data-i18n="positions_title">Positions</h1>
+    <p data-i18n="positions_subtitle">Détail de chaque ligne du portefeuille</p>
   </div>
   <div class="card">
     <div class="table-scroll">
       <table>
         <thead>
           <tr>
-            <th>Nom</th>
-            <th class="col-compte">Compte</th>
-            <th>Parts</th>
-            <th>Investi</th>
-            <th>Valeur actuelle</th>
+            <th data-i18n="col_name">Nom</th>
+            <th class="col-compte" data-i18n="col_compte">Compte</th>
+            <th data-i18n="col_shares">Parts</th>
+            <th data-i18n="col_invested">Investi</th>
+            <th data-i18n="col_value">Valeur actuelle</th>
             <th>+/- (€)</th>
             <th>+/- (%)</th>
           </tr>
@@ -323,12 +331,12 @@
 <!-- ══ EVOLUTION ══ -->
 <section id="evolution">
   <div class="page-header">
-    <h1>Évolution</h1>
-    <p>Performance globale et par ETF</p>
+    <h1 data-i18n="evolution_title">Évolution</h1>
+    <p data-i18n="evolution_subtitle">Performance globale et par ETF</p>
   </div>
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
-      <div class="card-title" style="margin-bottom:0">Portefeuille total</div>
+      <div class="card-title" style="margin-bottom:0" data-i18n="total_portfolio_title">Portefeuille total</div>
       <button class="btn btn-outline" id="btn-benchmark" onclick="toggleBenchmark()" style="font-size:12px;padding:5px 14px">vs S&P 500</button>
     </div>
     <div id="benchmark-perf" style="display:none;font-size:12px;margin-bottom:10px;font-family:'DM Mono',monospace;gap:24px"></div>
@@ -336,22 +344,22 @@
   </div>
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
-      <div class="card-title" style="margin-bottom:0">Par ETF — cours</div>
+      <div class="card-title" style="margin-bottom:0" data-i18n="per_etf_title">Par ETF — cours</div>
       <div class="period-tabs" id="etf-period-tabs" style="margin-bottom:0">
         <button class="period-tab" data-period="3m"  onclick="switchEtfPeriod('3m')">3M</button>
         <button class="period-tab" data-period="6m"  onclick="switchEtfPeriod('6m')">6M</button>
-        <button class="period-tab active" data-period="1y" onclick="switchEtfPeriod('1y')">1A</button>
-        <button class="period-tab" data-period="all" onclick="switchEtfPeriod('all')">Max</button>
+        <button class="period-tab active" data-period="1y" onclick="switchEtfPeriod('1y')" data-i18n="period_1y">1A</button>
+        <button class="period-tab" data-period="all" onclick="switchEtfPeriod('all')" data-i18n="period_max">Max</button>
       </div>
     </div>
     <div class="etf-tabs" id="etf-tabs"></div>
     <div class="chart-wrap"><canvas id="chart-evol-etf"></canvas></div>
     <div style="display:flex;gap:24px;margin-top:14px;justify-content:center">
       <span style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px">
-        <svg width="22" height="4" style="flex-shrink:0"><line x1="0" y1="2" x2="22" y2="2" stroke="#4ecfb3" stroke-width="2.5"/></svg>Cours ETF
+        <svg width="22" height="4" style="flex-shrink:0"><line x1="0" y1="2" x2="22" y2="2" stroke="#4ecfb3" stroke-width="2.5"/></svg><span data-i18n="etf_legend_price">Cours ETF</span>
       </span>
       <span style="font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px">
-        <span style="color:#4ecfb3;font-size:14px;margin-right:4px">▲</span>Achat
+        <span style="color:#4ecfb3;font-size:14px;margin-right:4px">▲</span><span data-i18n="etf_legend_buy">Achat</span>
       </span>
     </div>
   </div>
@@ -360,17 +368,17 @@
 <!-- ══ ALLOCATION ══ -->
 <section id="allocation">
   <div class="page-header">
-    <h1>Répartition</h1>
-    <p>Exposition géographique et sectorielle consolidée</p>
+    <h1 data-i18n="allocation_title">Répartition</h1>
+    <p data-i18n="allocation_subtitle">Exposition géographique et sectorielle consolidée</p>
   </div>
   <div class="two-col">
     <div class="card">
-      <div class="card-title">Géographie</div>
+      <div class="card-title" data-i18n="geo_title">Géographie</div>
       <div class="chart-wrap-sm"><canvas id="chart-geo"></canvas></div>
       <div class="legend" id="legend-geo"></div>
     </div>
     <div class="card">
-      <div class="card-title">Secteurs</div>
+      <div class="card-title" data-i18n="sector_title">Secteurs</div>
       <div class="chart-wrap-sm"><canvas id="chart-sector"></canvas></div>
       <div class="legend" id="legend-sector"></div>
     </div>
@@ -380,28 +388,28 @@
 <!-- ══ PROJECTION ══ -->
 <section id="projection">
   <div class="page-header">
-    <h1>Projection de capital</h1>
-    <p>Simulation de la valeur future selon différents scénarios de rendement annuel</p>
+    <h1 data-i18n="projection_title">Projection de capital</h1>
+    <p data-i18n="projection_subtitle">Simulation de la valeur future selon différents scénarios de rendement annuel</p>
   </div>
   <div class="card" style="margin-bottom:20px">
-    <div class="card-title">Paramètres</div>
+    <div class="card-title" data-i18n="proj_params">Paramètres</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;align-items:start">
       <div>
-        <div class="mstat-label" style="margin-bottom:6px">Capital actuel (portefeuille)</div>
+        <div class="mstat-label" style="margin-bottom:6px" data-i18n="proj_current_label">Capital actuel (portefeuille)</div>
         <div class="mstat-value" id="proj-current" style="font-size:20px">—</div>
       </div>
       <div>
-        <label for="proj-monthly" class="mstat-label">Versement mensuel (€)</label>
+        <label for="proj-monthly" class="mstat-label" data-i18n="proj_monthly_label">Versement mensuel (€)</label>
         <input type="number" id="proj-monthly" class="proj-input" value="300" min="0" max="10000" step="50">
       </div>
       <div>
-        <label for="proj-years" class="mstat-label">Horizon : <strong id="proj-years-label" style="color:var(--text)">20 ans</strong></label>
+        <label for="proj-years" class="mstat-label" data-i18n="proj_horizon_prefix">Horizon : <strong id="proj-years-label" style="color:var(--text)">20 ans</strong></label>
         <input type="range" id="proj-years" value="20" min="1" max="40" step="1">
       </div>
     </div>
   </div>
   <div class="card">
-    <div class="card-title">Valeur projetée</div>
+    <div class="card-title" data-i18n="proj_chart_title">Valeur projetée</div>
     <div class="chart-wrap" style="height:300px"><canvas id="chart-projection"></canvas></div>
     <div id="proj-summary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px;padding-top:20px;border-top:1px solid var(--border)"></div>
   </div>
@@ -410,71 +418,71 @@
 <!-- ══ IMPORT ══ -->
 <section id="import" class="active">
   <div class="page-header">
-    <h1>Bienvenue</h1>
-    <p>Outil de suivi de portefeuille pour investisseurs Trade Republic (Limité aux ETFs pour le moment)</p>
+    <h1 data-i18n="import_title">Bienvenue</h1>
+    <p data-i18n="import_subtitle">Outil de suivi de portefeuille pour investisseurs Trade Republic</p>
   </div>
 
   <!-- Présentation -->
   <div class="card" style="margin-bottom:16px">
-    <div class="card-title">À quoi ça sert ?</div>
-    <p style="color:var(--muted);font-size:13px;line-height:1.8;margin-bottom:20px">
+    <div class="card-title" data-i18n="what_title">À quoi ça sert ?</div>
+    <p style="color:var(--muted);font-size:13px;line-height:1.8;margin-bottom:20px" data-i18n="what_desc">
       Cet outil analyse ton historique d'investissement Trade Republic et te donne une vue claire de ton portefeuille,
       sans compte, sans abonnement. Tes données restent dans ton navigateur — rien n'est stocké sur un serveur.
     </p>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
       <div style="background:var(--surface2);border-radius:10px;padding:14px 16px">
         <div style="font-size:18px;margin-bottom:6px">📊</div>
-        <div style="font-weight:500;font-size:13px;margin-bottom:4px">Vue d'ensemble</div>
-        <div style="color:var(--muted);font-size:12px">Valeur, plus-value, TWRR, MWRR, performance par période</div>
+        <div style="font-weight:500;font-size:13px;margin-bottom:4px" data-i18n="feature_overview_title">Vue d'ensemble</div>
+        <div style="color:var(--muted);font-size:12px" data-i18n="feature_overview_desc">Valeur, plus-value, TWRR, MWRR, performance par période</div>
       </div>
       <div style="background:var(--surface2);border-radius:10px;padding:14px 16px">
         <div style="font-size:18px;margin-bottom:6px">🌍</div>
-        <div style="font-weight:500;font-size:13px;margin-bottom:4px">Répartition</div>
-        <div style="color:var(--muted);font-size:12px">Exposition géographique et sectorielle consolidée, par ETF</div>
+        <div style="font-weight:500;font-size:13px;margin-bottom:4px" data-i18n="feature_alloc_title">Répartition</div>
+        <div style="color:var(--muted);font-size:12px" data-i18n="feature_alloc_desc">Exposition géographique et sectorielle consolidée, par ETF</div>
       </div>
       <div style="background:var(--surface2);border-radius:10px;padding:14px 16px">
         <div style="font-size:18px;margin-bottom:6px">📈</div>
-        <div style="font-weight:500;font-size:13px;margin-bottom:4px">Évolution</div>
-        <div style="color:var(--muted);font-size:12px">Courbe de valorisation, comparaison S&P 500, repères d'achat</div>
+        <div style="font-weight:500;font-size:13px;margin-bottom:4px" data-i18n="feature_evol_title">Évolution</div>
+        <div style="color:var(--muted);font-size:12px" data-i18n="feature_evol_desc">Courbe de valorisation, comparaison S&P 500, repères d'achat</div>
       </div>
       <div style="background:var(--surface2);border-radius:10px;padding:14px 16px">
         <div style="font-size:18px;margin-bottom:6px">🔮</div>
-        <div style="font-weight:500;font-size:13px;margin-bottom:4px">Projection</div>
-        <div style="color:var(--muted);font-size:12px">Simulation de capital à 5, 10, 20 ans selon 3 scénarios</div>
+        <div style="font-weight:500;font-size:13px;margin-bottom:4px" data-i18n="feature_proj_title">Projection</div>
+        <div style="color:var(--muted);font-size:12px" data-i18n="feature_proj_desc">Simulation de capital à 5, 10, 20 ans selon 3 scénarios</div>
       </div>
     </div>
   </div>
 
   <!-- Guide export TR -->
   <div class="card" style="margin-bottom:16px">
-    <div class="card-title">Comment exporter depuis Trade Republic ?</div>
+    <div class="card-title" data-i18n="how_title">Comment exporter depuis Trade Republic ?</div>
     <div style="display:flex;flex-direction:column;gap:12px">
       <div style="display:flex;gap:14px;align-items:flex-start">
         <div style="background:var(--accent);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">1</div>
         <div>
-          <div style="font-size:13px;font-weight:500">Ouvre l'application Trade Republic</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px">Sur mobile ou sur <strong style="color:var(--text)">app.traderepublic.com</strong></div>
+          <div style="font-size:13px;font-weight:500" data-i18n="step1_title">Ouvre l'application Trade Republic</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px" data-i18n="step1_desc">Sur mobile ou sur <strong style="color:var(--text)">app.traderepublic.com</strong></div>
         </div>
       </div>
       <div style="display:flex;gap:14px;align-items:flex-start">
         <div style="background:var(--accent);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">2</div>
         <div>
-          <div style="font-size:13px;font-weight:500">Va dans Profil → Relevés</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px">Icône de profil en haut à droite → section "Relevés"</div>
+          <div style="font-size:13px;font-weight:500" data-i18n="step2_title">Va dans Profil → Relevés</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px" data-i18n="step2_desc">Icône de profil en haut à droite → section "Relevés"</div>
         </div>
       </div>
       <div style="display:flex;gap:14px;align-items:flex-start">
         <div style="background:var(--accent);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">3</div>
         <div>
-          <div style="font-size:13px;font-weight:500">Exportation de transactions</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px">Clique sur <strong style="color:var(--text)">"Exportation de transactions"</strong>, sélectionne la période, télécharge le CSV</div>
+          <div style="font-size:13px;font-weight:500" data-i18n="step3_title">Exportation de transactions</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px" data-i18n="step3_desc">Clique sur <strong style="color:var(--text)">"Exportation de transactions"</strong>, sélectionne la période, télécharge le CSV</div>
         </div>
       </div>
       <div style="display:flex;gap:14px;align-items:flex-start">
         <div style="background:var(--accent2);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">4</div>
         <div>
-          <div style="font-size:13px;font-weight:500">Importe le fichier ci-dessous</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px">Le bouton <strong style="color:var(--text)">"Importer"</strong> parse le CSV et charge automatiquement les prix et la répartition (~30s par ETF)</div>
+          <div style="font-size:13px;font-weight:500" data-i18n="step4_title">Importe le fichier ci-dessous</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px" data-i18n="step4_desc">Le bouton <strong style="color:var(--text)">"Importer"</strong> parse le CSV et charge automatiquement les prix et la répartition (~30s par ETF)</div>
         </div>
       </div>
     </div>
@@ -482,16 +490,16 @@
 
   <!-- Zone d'import -->
   <div class="card">
-    <div class="card-title">Importer ton CSV</div>
+    <div class="card-title" data-i18n="import_card_title">Importer ton CSV</div>
     <label class="upload-zone" id="upload-zone">
       <input type="file" id="file-input" accept=".csv">
       <div class="upload-icon">↑</div>
-      <div class="upload-title">Glisse ton CSV ici</div>
-      <div class="upload-sub">ou clique pour choisir un fichier</div>
+      <div class="upload-title" data-i18n="upload_title">Glisse ton CSV ici</div>
+      <div class="upload-sub" data-i18n="upload_sub">ou clique pour choisir un fichier</div>
     </label>
     <div style="display:flex; gap:12px; margin-top:16px; align-items:center; flex-wrap:wrap;">
-      <button class="btn btn-primary" id="btn-import" disabled onclick="doImport()">Importer</button>
-      <button class="btn btn-danger" onclick="doReset()">Réinitialiser</button>
+      <button class="btn btn-primary" id="btn-import" disabled onclick="doImport()" data-i18n="btn_import_text">Importer</button>
+      <button class="btn btn-danger" onclick="doReset()" data-i18n="btn_reset_text">Réinitialiser</button>
       <span id="selected-file" style="color:var(--muted);font-size:12px;"></span>
     </div>
     <div class="status-log" id="status-log"></div>
@@ -529,20 +537,209 @@
     <div class="period-tabs" id="modal-period-tabs">
       <button class="period-tab" data-period="3m"  onclick="loadModalChart('3m')">3M</button>
       <button class="period-tab" data-period="6m"  onclick="loadModalChart('6m')">6M</button>
-      <button class="period-tab active" data-period="1y" onclick="loadModalChart('1y')">1A</button>
-      <button class="period-tab" data-period="all" onclick="loadModalChart('all')">Max</button>
+      <button class="period-tab active" data-period="1y" onclick="loadModalChart('1y')" data-i18n="period_1y">1A</button>
+      <button class="period-tab" data-period="all" onclick="loadModalChart('all')" data-i18n="period_max">Max</button>
     </div>
     <div class="modal-chart-wrap" id="modal-chart-wrap">
       <canvas id="modal-chart"></canvas>
     </div>
     <div class="modal-legend">
-      <span><svg width="22" height="4" style="flex-shrink:0"><line x1="0" y1="2" x2="22" y2="2" stroke="#6c8ef5" stroke-width="2.5"/></svg>Valeur position</span>
-      <span><span style="color:#4ecfb3; font-size:14px; margin-right:4px">▲</span>Achat</span>
+      <span><svg width="22" height="4" style="flex-shrink:0"><line x1="0" y1="2" x2="22" y2="2" stroke="#6c8ef5" stroke-width="2.5"/></svg><span data-i18n="modal_legend_position">Valeur position</span></span>
+      <span><span style="color:#4ecfb3; font-size:14px; margin-right:4px">▲</span><span data-i18n="modal_legend_buy">Achat</span></span>
     </div>
   </div>
 </div>
 
 <script>
+// ── i18n ─────────────────────────────────────────────────────────────────────
+const TRANSLATIONS = {
+  fr: {
+    nav_home:'Accueil', nav_overview:"Vue d'ensemble", nav_positions:'Positions',
+    nav_evolution:'Évolution', nav_allocation:'Répartition', nav_projection:'Projection',
+    overview_title:"Vue d'ensemble", overview_date:'Dernière mise à jour : ',
+    perf_card_title:'Performance de la période',
+    evol_chart_title:'Évolution du portefeuille', monthly_chart_title:'Investissements mensuels',
+    kpi_current_value:'Valeur actuelle', kpi_invested:'Total investi',
+    kpi_gain:'Plus-value', kpi_ytd:'Investi YTD',
+    kpi_since_start:"depuis l'origine", kpi_this_year:'Cette année',
+    tip_current_value:'Valeur totale de vos positions au cours de clôture le plus récent.',
+    tip_invested:"Somme de tous vos versements depuis l'ouverture du portefeuille.",
+    tip_gain:"Différence entre la valeur actuelle et le total investi. Représente le gain ou la perte dû aux mouvements de marché.",
+    tip_ytd:"Montant versé depuis le 1er janvier de l'année en cours.",
+    tip_twrr:"Time-Weighted Rate of Return : mesure la performance de votre stratégie indépendamment du timing et des montants investis. Comparable à un benchmark de marché.",
+    tip_mwrr:"Money-Weighted Rate of Return : taux de rendement interne (IRR) qui tient compte du montant et du moment de chaque versement. Reflète votre rendement réel.",
+    twrr_label:'TWRR annualisé', mwrr_label:'MWRR annualisé',
+    twrr_sub:'Total sur {y}a : {v}', twrr_desc:'Perf. pondérée temps',
+    mwrr_desc:'Taux interne de rendement',
+    period_1y:'1A', period_max:'Max',
+    period_label_1m:'Dernier mois', period_label_ytd:'Cette année', period_label_max:'Depuis le début',
+    perf_start:'Début de période', perf_current:'Valeur actuelle', perf_invested_during:'Investi sur période',
+    positions_title:'Positions', positions_subtitle:'Détail de chaque ligne du portefeuille',
+    col_name:'Nom', col_compte:'Compte', col_shares:'Parts',
+    col_invested:'Investi', col_value:'Valeur actuelle',
+    positions_empty:"Aucune position — importe ton CSV d'abord.",
+    evolution_title:'Évolution', evolution_subtitle:'Performance globale et par ETF',
+    total_portfolio_title:'Portefeuille total', per_etf_title:'Par ETF — cours',
+    etf_legend_price:'Cours ETF', etf_legend_buy:'Achat',
+    bench_base:'(base 100, depuis le début)',
+    bench_portfolio_label:'Portefeuille', bench_sp500_label:'S&P 500 (iShares)',
+    allocation_title:'Répartition',
+    allocation_subtitle:'Exposition géographique et sectorielle consolidée',
+    geo_title:'Géographie', sector_title:'Secteurs',
+    alloc_no_data:"Aucune donnée — lance l'enrichissement d'abord",
+    alloc_modal_geo:'Répartition géographique — sources ETF',
+    alloc_modal_sector:'Répartition sectorielle — sources ETF',
+    alloc_total_contrib:'Contribution totale au portefeuille :',
+    alloc_in_index:"dans l'indice", alloc_of_portfolio:'du portefeuille',
+    alloc_no_etf:"Aucun ETF ne contribue à cette catégorie.",
+    mstat_shares:'Parts', mstat_avg_price:'Px moyen', mstat_invested:'Investi',
+    mstat_value:'Valeur act.', mstat_gain:'Plus-value', mstat_perf:'Perf.',
+    modal_legend_position:'Valeur position', modal_legend_buy:'Achat',
+    tooltip_price:'Prix', buy_shares:'parts', buy_avg:'Prix moy. :', buy_invested:'Investi :',
+    projection_title:'Projection de capital',
+    projection_subtitle:'Simulation de la valeur future selon différents scénarios de rendement annuel',
+    proj_params:'Paramètres', proj_current_label:'Capital actuel (portefeuille)',
+    proj_monthly_label:'Versement mensuel (€)', proj_horizon_prefix:'Horizon :',
+    proj_years_suffix:'ans', proj_chart_title:'Valeur projetée',
+    scenario_conservative:'Conservateur (4%)', scenario_moderate:'Modéré (7%)', scenario_optimistic:'Optimiste (10%)',
+    proj_gain_label:'+{v} € de gain', proj_contributed_label:'dont {v} € versés',
+    import_title:'Bienvenue', import_subtitle:'Outil de suivi de portefeuille pour investisseurs Trade Republic',
+    what_title:'À quoi ça sert ?',
+    what_desc:"Cet outil analyse ton historique d'investissement Trade Republic et te donne une vue claire de ton portefeuille, sans compte, sans abonnement. Tes données restent dans ton navigateur — rien n'est stocké sur un serveur.",
+    feature_overview_title:"Vue d'ensemble", feature_overview_desc:'Valeur, plus-value, TWRR, MWRR, performance par période',
+    feature_alloc_title:'Répartition', feature_alloc_desc:'Exposition géographique et sectorielle consolidée, par ETF',
+    feature_evol_title:'Évolution', feature_evol_desc:"Courbe de valorisation, comparaison S&P 500, repères d'achat",
+    feature_proj_title:'Projection', feature_proj_desc:'Simulation de capital à 5, 10, 20 ans selon 3 scénarios',
+    how_title:'Comment exporter depuis Trade Republic ?',
+    step1_title:"Ouvre l'application Trade Republic",
+    step1_desc:'Sur mobile ou sur <strong style="color:var(--text)">app.traderepublic.com</strong>',
+    step2_title:'Va dans Profil → Relevés',
+    step2_desc:'Icône de profil en haut à droite → section "Relevés"',
+    step3_title:'Exportation de transactions',
+    step3_desc:'Clique sur <strong style="color:var(--text)">"Exportation de transactions"</strong>, sélectionne la période, télécharge le CSV',
+    step4_title:'Importe le fichier ci-dessous',
+    step4_desc:'Le bouton <strong style="color:var(--text)">"Importer"</strong> parse le CSV et charge automatiquement les prix et la répartition (~30s par ETF)',
+    import_card_title:'Importer ton CSV', upload_title:'Glisse ton CSV ici',
+    upload_sub:'ou clique pour choisir un fichier',
+    btn_import_text:'Importer', btn_reset_text:'Réinitialiser', btn_enriching:'Enrichissement…',
+    log_reading:'Lecture du fichier {file}…',
+    log_no_new:'Aucune nouvelle transaction — données déjà à jour.',
+    log_imported:'✓ {n} transaction(s) importée(s)',
+    log_enriching:'Enrichissement de {n} ETF(s) depuis {date}…',
+    log_timeout:'Timeout 120s dépassé', log_computing:'Calcul des analytics…',
+    log_done:'✓ Terminé.',
+    log_warmup:'⏳ Réveil du serveur (~30s)… Merci de patienter.',
+    log_server_ready:'✓ Serveur prêt.', log_error:'✗ Erreur : {msg}',
+    log_cleared:'✓ Données effacées — tu peux importer un nouveau CSV.',
+    loading:'Chargement…',
+    reset_confirm:"Effacer toutes les données en cache ?\nCette action est irréversible.",
+    import_empty:'Importe ton CSV Trade Republic pour commencer.',
+    vs_sp500:'vs S&P 500', back_to_eur:'← Valeur €',
+  },
+  en: {
+    nav_home:'Home', nav_overview:'Overview', nav_positions:'Positions',
+    nav_evolution:'Evolution', nav_allocation:'Allocation', nav_projection:'Projection',
+    overview_title:'Overview', overview_date:'Last updated: ',
+    perf_card_title:'Period Performance',
+    evol_chart_title:'Portfolio Evolution', monthly_chart_title:'Monthly Investments',
+    kpi_current_value:'Current Value', kpi_invested:'Total Invested',
+    kpi_gain:'Gain/Loss', kpi_ytd:'YTD Invested',
+    kpi_since_start:'since inception', kpi_this_year:'This year',
+    tip_current_value:'Total value of your positions at the most recent closing price.',
+    tip_invested:'Sum of all your contributions since the portfolio was opened.',
+    tip_gain:'Difference between current value and total invested. Represents gain or loss due to market movements.',
+    tip_ytd:'Amount invested since January 1st of the current year.',
+    tip_twrr:"Time-Weighted Rate of Return: measures your strategy's performance independently of investment timing and amounts. Comparable to a market benchmark.",
+    tip_mwrr:"Money-Weighted Rate of Return: internal rate of return (IRR) that accounts for the amount and timing of each contribution. Reflects your actual return.",
+    twrr_label:'Annualized TWRR', mwrr_label:'Annualized MWRR',
+    twrr_sub:'Total over {y}y: {v}', twrr_desc:'Time-weighted perf.',
+    mwrr_desc:'Internal rate of return',
+    period_1y:'1Y', period_max:'Max',
+    period_label_1m:'Last month', period_label_ytd:'This year', period_label_max:'Since inception',
+    perf_start:'Period Start', perf_current:'Current Value', perf_invested_during:'Invested During Period',
+    positions_title:'Positions', positions_subtitle:'Portfolio holdings detail',
+    col_name:'Name', col_compte:'Account', col_shares:'Shares',
+    col_invested:'Invested', col_value:'Current Value',
+    positions_empty:'No positions — import your CSV first.',
+    evolution_title:'Evolution', evolution_subtitle:'Global and per-ETF performance',
+    total_portfolio_title:'Total Portfolio', per_etf_title:'Per ETF — Price',
+    etf_legend_price:'ETF Price', etf_legend_buy:'Purchase',
+    bench_base:'(base 100, since inception)',
+    bench_portfolio_label:'Portfolio', bench_sp500_label:'S&P 500 (iShares)',
+    allocation_title:'Allocation',
+    allocation_subtitle:'Consolidated geographic and sector exposure',
+    geo_title:'Geography', sector_title:'Sectors',
+    alloc_no_data:'No data — run enrichment first',
+    alloc_modal_geo:'Geographic allocation — ETF sources',
+    alloc_modal_sector:'Sector allocation — ETF sources',
+    alloc_total_contrib:'Total portfolio contribution:',
+    alloc_in_index:'in the index', alloc_of_portfolio:'of portfolio',
+    alloc_no_etf:'No ETF contributes to this category.',
+    mstat_shares:'Shares', mstat_avg_price:'Avg Price', mstat_invested:'Invested',
+    mstat_value:'Current Value', mstat_gain:'Gain/Loss', mstat_perf:'Perf.',
+    modal_legend_position:'Position Value', modal_legend_buy:'Purchase',
+    tooltip_price:'Price', buy_shares:'shares', buy_avg:'Avg price:', buy_invested:'Invested:',
+    projection_title:'Capital Projection',
+    projection_subtitle:'Future value simulation under different annual return scenarios',
+    proj_params:'Parameters', proj_current_label:'Current Capital (portfolio)',
+    proj_monthly_label:'Monthly Contribution (€)', proj_horizon_prefix:'Horizon:',
+    proj_years_suffix:'years', proj_chart_title:'Projected Value',
+    scenario_conservative:'Conservative (4%)', scenario_moderate:'Moderate (7%)', scenario_optimistic:'Optimistic (10%)',
+    proj_gain_label:'+{v} € in gains', proj_contributed_label:'including {v} € contributed',
+    import_title:'Welcome', import_subtitle:'Portfolio tracking tool for Trade Republic investors',
+    what_title:'What does it do?',
+    what_desc:"This tool analyses your Trade Republic investment history and gives you a clear view of your portfolio — no account, no subscription. Your data stays in your browser — nothing is stored on a server.",
+    feature_overview_title:'Overview', feature_overview_desc:'Value, gain/loss, TWRR, MWRR, period performance',
+    feature_alloc_title:'Allocation', feature_alloc_desc:'Consolidated geographic and sector exposure, by ETF',
+    feature_evol_title:'Evolution', feature_evol_desc:'Value curve, S&P 500 comparison, purchase markers',
+    feature_proj_title:'Projection', feature_proj_desc:'Capital simulation over 5, 10, 20 years with 3 scenarios',
+    how_title:'How to export from Trade Republic?',
+    step1_title:'Open the Trade Republic app',
+    step1_desc:'On mobile or at <strong style="color:var(--text)">app.traderepublic.com</strong>',
+    step2_title:'Go to Profile → Statements',
+    step2_desc:'Profile icon in the top right → "Statements" section',
+    step3_title:'Transaction Export',
+    step3_desc:'Click on <strong style="color:var(--text)">"Transaction export"</strong>, select the period, download the CSV',
+    step4_title:'Import the file below',
+    step4_desc:'The <strong style="color:var(--text)">"Import"</strong> button parses the CSV and automatically loads prices and allocation (~30s per ETF)',
+    import_card_title:'Import your CSV', upload_title:'Drop your CSV here',
+    upload_sub:'or click to select a file',
+    btn_import_text:'Import', btn_reset_text:'Reset', btn_enriching:'Enriching…',
+    log_reading:'Reading file {file}…',
+    log_no_new:'No new transactions — data already up to date.',
+    log_imported:'✓ {n} transaction(s) imported',
+    log_enriching:'Enriching {n} ETF(s) since {date}…',
+    log_timeout:'Timeout 120s exceeded', log_computing:'Computing analytics…',
+    log_done:'✓ Done.',
+    log_warmup:'⏳ Waking up server (~30s)… Please wait.',
+    log_server_ready:'✓ Server ready.', log_error:'✗ Error: {msg}',
+    log_cleared:'✓ Data cleared — you can import a new CSV.',
+    loading:'Loading…',
+    reset_confirm:'Clear all cached data?\nThis action is irreversible.',
+    import_empty:'Import your Trade Republic CSV to get started.',
+    vs_sp500:'vs S&P 500', back_to_eur:'← Value €',
+  }
+};
+
+let currentLang = localStorage.getItem('lang') || 'fr';
+
+function t(key, vars = {}) {
+  let s = (TRANSLATIONS[currentLang]||{})[key] || (TRANSLATIONS.fr||{})[key] || key;
+  Object.entries(vars).forEach(([k,v]) => { s = s.replaceAll(`{${k}}`, v); });
+  return s;
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('lang', lang);
+  document.getElementById('flag-fr').className = 'lang-btn ' + (lang==='fr' ? 'active' : 'inactive');
+  document.getElementById('flag-en').className = 'lang-btn ' + (lang==='en' ? 'active' : 'inactive');
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.innerHTML = t(el.dataset.i18n); });
+  overviewLoaded = positionsLoaded = evolutionLoaded = allocationLoaded = projectionLoaded = false;
+  const active = document.querySelector('section.active');
+  if (active) show(active.id);
+}
+
 const _local = ['localhost', '127.0.0.1'].includes(window.location.hostname);
 const API = _local
   ? `${window.location.protocol}//${window.location.host}/api`
@@ -681,7 +878,7 @@ let positionsData = [];
 async function loadOverview() {
   if (!ANALYTICS) {
     document.getElementById('kpi-grid').innerHTML =
-      '<div class="empty" style="text-align:center;padding:40px 0;color:var(--muted)"><p>Importe ton CSV Trade Republic pour commencer.</p></div>';
+      `<div class="empty" style="text-align:center;padding:40px 0;color:var(--muted)"><p>${t('import_empty')}</p></div>`;
     document.getElementById('metrics-grid').innerHTML = '';
     document.getElementById('perf-content').innerHTML = '';
     overviewLoaded = true; return;
@@ -690,30 +887,30 @@ async function loadOverview() {
   const evolution = ANALYTICS.evolution;
 
   document.getElementById('overview-date').textContent =
-    'Dernière mise à jour : ' + new Date().toLocaleDateString('fr-FR');
+    t('overview_date') + new Date().toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'en-US');
 
   const kpiGrid = document.getElementById('kpi-grid');
-  const tip = (text) => `<span class="info-btn" data-tip="${text}">ⓘ</span>`;
+  const tip = (key) => `<span class="info-btn" data-tip="${t(key)}">ⓘ</span>`;
   kpiGrid.innerHTML = `
     <div class="kpi">
-      <div class="kpi-label">Valeur actuelle ${tip('Valeur totale de vos positions au cours de clôture le plus récent.')}</div>
+      <div class="kpi-label">${t('kpi_current_value')} ${tip('tip_current_value')}</div>
       <div class="kpi-value">${fmt(summary.total_value, 2)} €</div>
-      <div class="kpi-sub ${pctClass(summary.total_gain_pct)}">${fmtPct(summary.total_gain_pct)} depuis l'origine</div>
+      <div class="kpi-sub ${pctClass(summary.total_gain_pct)}">${fmtPct(summary.total_gain_pct)} ${t('kpi_since_start')}</div>
     </div>
     <div class="kpi">
-      <div class="kpi-label">Total investi ${tip('Somme de tous vos versements depuis l\'ouverture du portefeuille.')}</div>
+      <div class="kpi-label">${t('kpi_invested')} ${tip('tip_invested')}</div>
       <div class="kpi-value">${fmt(summary.total_invested, 2)} €</div>
       <div class="kpi-sub">${summary.nb_positions} position${summary.nb_positions > 1 ? 's' : ''}</div>
     </div>
     <div class="kpi">
-      <div class="kpi-label">Plus-value ${tip('Différence entre la valeur actuelle et le total investi. Représente le gain ou la perte dû aux mouvements de marché.')}</div>
+      <div class="kpi-label">${t('kpi_gain')} ${tip('tip_gain')}</div>
       <div class="kpi-value ${pctClass(summary.total_gain_abs)}">${fmtEur(summary.total_gain_abs)}</div>
       <div class="kpi-sub ${pctClass(summary.total_gain_pct)}">${fmtPct(summary.total_gain_pct)}</div>
     </div>
     <div class="kpi">
-      <div class="kpi-label">Investi YTD ${tip('Montant versé depuis le 1er janvier de l\'année en cours.')}</div>
+      <div class="kpi-label">${t('kpi_ytd')} ${tip('tip_ytd')}</div>
       <div class="kpi-value">${fmt(summary.ytd_invested, 2)} €</div>
-      <div class="kpi-sub">Cette année</div>
+      <div class="kpi-sub">${t('kpi_this_year')}</div>
     </div>
   `;
 
@@ -769,18 +966,18 @@ function renderMetrics(data) {
   const mwrrA = data.mwrr_annualized;
   const twrrT = data.twrr_total;
   const yrs   = data.years;
-  const t = (txt) => `<span class="info-btn" data-tip="${txt}">ⓘ</span>`;
+  const tip2 = (key) => `<span class="info-btn" data-tip="${t(key)}">ⓘ</span>`;
   grid.innerHTML = [
     {
-      label: `TWRR annualisé ${t('Time-Weighted Rate of Return : mesure la performance de votre stratégie indépendamment du timing et des montants investis. Comparable à un benchmark de marché.')}`,
+      label: `${t('twrr_label')} ${tip2('tip_twrr')}`,
       value: twrrA != null ? `${twrrA >= 0 ? '+' : ''}${fmt(twrrA, 2)}%` : '—',
-      sub:   twrrT != null ? `Total sur ${yrs}a : ${twrrT >= 0 ? '+' : ''}${fmt(twrrT, 2)}%` : 'Perf. pondérée temps',
+      sub:   twrrT != null ? t('twrr_sub', {y: yrs, v: (twrrT >= 0 ? '+' : '') + fmt(twrrT, 2) + '%'}) : t('twrr_desc'),
       cls:   twrrA != null ? pctClass(twrrA) : '',
     },
     {
-      label: `MWRR annualisé ${t('Money-Weighted Rate of Return : taux de rendement interne (IRR) qui tient compte du montant et du moment de chaque versement. Reflète votre rendement réel.')}`,
+      label: `${t('mwrr_label')} ${tip2('tip_mwrr')}`,
       value: mwrrA != null ? `${mwrrA >= 0 ? '+' : ''}${fmt(mwrrA, 2)}%` : '—',
-      sub:   'Taux interne de rendement',
+      sub:   t('mwrr_desc'),
       cls:   mwrrA != null ? pctClass(mwrrA) : '',
     },
   ].map(m => `
@@ -805,17 +1002,20 @@ function renderPerfContent(d, period) {
   const hasReturn = d.return_pct != null;
   const pctColor  = hasReturn ? (d.return_pct >= 0 ? 'var(--gain)' : 'var(--loss)') : 'var(--muted)';
   const sign      = hasReturn && d.return_pct >= 0 ? '+' : '';
+  const periodLabel = period === 'mtd'
+    ? new Date().toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'en-US', {month:'long', year:'numeric'})
+    : (t(`period_label_${period}`) || d.period);
   el.innerHTML = `
     <div style="display:flex;gap:40px;flex-wrap:wrap;align-items:flex-end">
       <div>
-        <div class="mstat-label" style="margin-bottom:8px">${d.period}</div>
+        <div class="mstat-label" style="margin-bottom:8px">${periodLabel}</div>
         <div class="perf-big" style="color:${pctColor}">${hasReturn ? sign + fmt(d.return_pct, 2) + '%' : '—'}</div>
         <div class="perf-sub" style="color:${pctColor}">${hasReturn ? sign + fmt(d.return_abs, 0) + ' €' : ''}</div>
       </div>
       <div style="display:flex;gap:28px;flex-wrap:wrap">
-        <div class="mstat"><span class="mstat-label">Début de période</span><span class="mstat-value">${fmtEur(d.start_value)}</span></div>
-        <div class="mstat"><span class="mstat-label">Valeur actuelle</span><span class="mstat-value">${fmtEur(d.end_value)}</span></div>
-        <div class="mstat"><span class="mstat-label">Investi sur période</span><span class="mstat-value">${fmtEur(d.invested_during)}</span></div>
+        <div class="mstat"><span class="mstat-label">${t('perf_start')}</span><span class="mstat-value">${fmtEur(d.start_value)}</span></div>
+        <div class="mstat"><span class="mstat-label">${t('perf_current')}</span><span class="mstat-value">${fmtEur(d.end_value)}</span></div>
+        <div class="mstat"><span class="mstat-label">${t('perf_invested_during')}</span><span class="mstat-value">${fmtEur(d.invested_during)}</span></div>
       </div>
     </div>`;
 }
@@ -835,7 +1035,7 @@ async function loadPositions() {
   const tbody = document.getElementById('positions-tbody');
 
   if (!positionsData.length) {
-    tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><p>Aucune position — importe ton CSV d\'abord.</p></div></td></tr>';
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty"><p>${t('positions_empty')}</p></div></td></tr>`;
     positionsLoaded = true; return;
   }
 
@@ -899,9 +1099,9 @@ function renderEvolTotalChart() {
       const s  = v => (v >= 0 ? '+' : '') + fmt(v, 1) + '%';
       benchPerfEl.style.cssText = 'display:flex;gap:24px;font-size:12px;margin-bottom:10px;font-family:\'DM Mono\',monospace';
       benchPerfEl.innerHTML = `
-        <span style="color:#6c8ef5">Portefeuille : <strong>${s(pp)}</strong></span>
-        <span style="color:#f5a96c">S&P 500 (SPY) : <strong>${s(pb)}</strong></span>
-        <span style="color:var(--muted);font-size:11px">(base 100, depuis le début)</span>`;
+        <span style="color:#6c8ef5">${t('bench_portfolio_label')} : <strong>${s(pp)}</strong></span>
+        <span style="color:#f5a96c">${t('bench_sp500_label')} : <strong>${s(pb)}</strong></span>
+        <span style="color:var(--muted);font-size:11px">${t('bench_base')}</span>`;
     }
 
     charts.evolTotal = new Chart(ctx, {
@@ -910,13 +1110,13 @@ function renderEvolTotalChart() {
         labels,
         datasets: [
           {
-            label: 'Portefeuille',
+            label: t('bench_portfolio_label'),
             data: portf.map(d => d.value),
             borderColor: '#6c8ef5', backgroundColor: 'rgba(108,142,245,0.08)',
             fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2,
           },
           {
-            label: 'S&P 500 (iShares)',
+            label: t('bench_sp500_label'),
             data: bench.map(d => d.value),
             borderColor: '#f5a96c', backgroundColor: 'transparent',
             fill: false, tension: 0.3, pointRadius: 0, borderWidth: 2,
@@ -967,12 +1167,12 @@ async function toggleBenchmark() {
 
   if (evolBenchMode && !_benchData) {
     btn.disabled = true;
-    btn.textContent = 'Chargement…';
+    btn.textContent = t('loading');
     _benchData = await postWithPortfolio(`compute/benchmark?period=max`);
     btn.disabled = false;
-    btn.textContent = '← Valeur €';
+    btn.textContent = t('back_to_eur');
   } else {
-    btn.textContent = evolBenchMode ? '← Valeur €' : 'vs S&P 500';
+    btn.textContent = evolBenchMode ? t('back_to_eur') : t('vs_sp500');
   }
   renderEvolTotalChart();
 }
@@ -989,7 +1189,7 @@ async function loadProjection() {
   const yearsLabel   = document.getElementById('proj-years-label');
 
   function update() {
-    yearsLabel.textContent = `${yearsInput.value} ans`;
+    yearsLabel.textContent = `${yearsInput.value} ${t('proj_years_suffix')}`;
     renderProjectionChart(current, parseFloat(monthlyInput.value) || 0, parseInt(yearsInput.value));
   }
   monthlyInput.addEventListener('input', update);
@@ -1000,9 +1200,9 @@ async function loadProjection() {
 
 function renderProjectionChart(current, monthly, years) {
   const scenarios = [
-    { label: 'Conservateur (4%)',  rate: 4,  color: '#f5a96c' },
-    { label: 'Modéré (7%)',        rate: 7,  color: '#6c8ef5' },
-    { label: 'Optimiste (10%)',    rate: 10, color: '#4ecfb3' },
+    { label: t('scenario_conservative'), rate: 4,  color: '#f5a96c' },
+    { label: t('scenario_moderate'),     rate: 7,  color: '#6c8ef5' },
+    { label: t('scenario_optimistic'),   rate: 10, color: '#4ecfb3' },
   ];
 
   function project(rate) {
@@ -1055,8 +1255,8 @@ function renderProjectionChart(current, monthly, years) {
       <div style="text-align:center;padding:16px;background:var(--surface2);border-radius:10px">
         <div class="mstat-label" style="margin-bottom:8px">${s.label}</div>
         <div style="font-size:24px;font-weight:600;font-family:'DM Mono',monospace;color:${s.color};letter-spacing:-0.5px">${fmt(finalVal, 0)} €</div>
-        <div style="font-size:12px;color:var(--gain);margin-top:4px">+${fmt(gain, 0)} € de gain</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px">dont ${fmt(monthly * 12 * years, 0)} € versés</div>
+        <div style="font-size:12px;color:var(--gain);margin-top:4px">${t('proj_gain_label', {v: fmt(gain, 0)})}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${t('proj_contributed_label', {v: fmt(monthly * 12 * years, 0)})}</div>
       </div>`;
   }).join('');
 }
@@ -1116,7 +1316,7 @@ async function renderEtfPriceChart(isin, period) {
       datasets: [
         {
           type: 'line',
-          label: 'Cours ETF',
+          label: t('etf_legend_price'),
           data: priceData.map(d => d.close),
           borderColor: '#4ecfb3', backgroundColor: 'rgba(78,207,179,0.08)',
           fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2, order: 2,
@@ -1151,11 +1351,11 @@ async function renderEtfPriceChart(isin, period) {
                 const b = buysByLabel[item.label];
                 if (!b) return null;
                 return [
-                  ` ▲ Achat${b.count > 1 ? 's (' + b.count + ')' : ''} — ${b.shares.toFixed(4)} parts`,
-                  `   Prix moy. : ${fmt(b.amount / b.shares, 2)} €   Investi : ${fmt(b.amount, 2)} €`,
+                  ` ▲ ${t('etf_legend_buy')}${b.count > 1 ? 's (' + b.count + ')' : ''} — ${b.shares.toFixed(4)} ${t('buy_shares')}`,
+                  `   ${t('buy_avg')} ${fmt(b.amount / b.shares, 2)} €   ${t('buy_invested')} ${fmt(b.amount, 2)} €`,
                 ];
               }
-              return ` Cours : ${fmt(item.parsed.y, 2)} €`;
+              return ` ${t('tooltip_price')} : ${fmt(item.parsed.y, 2)} €`;
             }
           }
         }
@@ -1180,7 +1380,7 @@ async function loadAllocation() {
 function renderDonut(canvasId, legendId, data) {
   const legendEl = document.getElementById(legendId);
   if (!data.length) {
-    legendEl.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;padding-top:20px">Aucune donnée — lance l\'enrichissement d\'abord</p>';
+    legendEl.innerHTML = `<p style="color:var(--muted);font-size:13px;text-align:center;padding-top:20px">${t('alloc_no_data')}</p>`;
     return;
   }
   const ctx = document.getElementById(canvasId).getContext('2d');
@@ -1259,7 +1459,7 @@ async function _runEnrichAll() {
   if (!toEnrich.length) return;
 
   const since = fundTxs.map(t => t.date).sort()[0] || '2020-01-01';
-  logLine(`Enrichissement de ${toEnrich.length} ETF(s) depuis ${since}…`);
+  logLine(t('log_enriching', {n: toEnrich.length, date: since}));
 
   for (const { isin, name } of toEnrich) {
     logLine(`⋯ ${name} (${isin})…`);
@@ -1282,7 +1482,7 @@ async function _runEnrichAll() {
       logLine(`  ✓ geo: ${geo} pays · ${pts} prix`, 'log-ok');
     } catch(e) {
       clearTimeout(timer);
-      const msg = e.name === 'AbortError' ? 'Timeout 120s dépassé' : e.message;
+      const msg = e.name === 'AbortError' ? t('log_timeout') : e.message;
       logLine(`  ✗ ${msg}`, 'log-err');
     }
   }
@@ -1295,7 +1495,7 @@ async function doImport() {
   _importing = true;
   log.innerHTML = ''; log.classList.add('visible');
   btnImport.disabled = true;
-  logLine(`Lecture du fichier ${file.name}…`);
+  logLine(t('log_reading', {file: file.name}));
 
   const form = new FormData();
   form.append('file', file);
@@ -1314,7 +1514,7 @@ async function doImport() {
     const newTxs = (data.transactions || []).filter(t => !existingIds.has(t.id));
 
     if (newTxs.length === 0) {
-      logLine(`ℹ Aucune nouvelle transaction — données déjà à jour.`);
+      logLine(`ℹ ${t('log_no_new')}`);
       if (PORT.transactions.length) show('overview');
       return;
     }
@@ -1322,24 +1522,24 @@ async function doImport() {
     PORT.transactions.push(...newTxs);
     savePortfolio();
 
-    logLine(`✓ ${newTxs.length} transaction(s) importée(s)`, 'log-ok');
+    logLine(t('log_imported', {n: newTxs.length}), 'log-ok');
     const byIsin = {};
-    newTxs.forEach(t => {
-      if (!byIsin[t.isin]) byIsin[t.isin] = { name: t.name, asset_class: t.asset_class, count: 0 };
-      byIsin[t.isin].count++;
+    newTxs.forEach(tx => {
+      if (!byIsin[tx.isin]) byIsin[tx.isin] = { name: tx.name, asset_class: tx.asset_class, count: 0 };
+      byIsin[tx.isin].count++;
     });
     Object.values(byIsin).forEach(info =>
       logLine(`  + ${info.count}× [${info.asset_class}] ${info.name}`, 'log-ok')
     );
 
-    btnImport.textContent = 'Enrichissement…';
+    btnImport.textContent = t('btn_enriching');
     await _runEnrichAll();
-    logLine('Calcul des analytics…');
+    logLine(t('log_computing'));
     await refresh();
-    logLine('✓ Terminé.', 'log-ok');
+    logLine(t('log_done'), 'log-ok');
     show('overview');
   } catch(e) {
-    logLine('✗ Erreur : ' + e.message, 'log-err');
+    logLine(t('log_error', {msg: e.message}), 'log-err');
   } finally {
     _importing = false;
     btnImport.disabled = false;
@@ -1348,7 +1548,7 @@ async function doImport() {
 }
 
 function doReset() {
-  if (!confirm('Effacer toutes les données en cache ?\nCette action est irréversible.')) return;
+  if (!confirm(t('reset_confirm'))) return;
   localStorage.removeItem('portfolio_v1');
   Object.assign(PORT, { transactions: [], prices: {}, metadata: {} });
   ANALYTICS = null;
@@ -1358,7 +1558,7 @@ function doReset() {
   document.getElementById('selected-file').textContent = '';
   fileInput.value = '';
   btnImport.disabled = true;
-  logLine('✓ Données effacées — tu peux importer un nouveau CSV.', 'log-ok');
+  logLine(t('log_cleared'), 'log-ok');
 }
 
 // ── Allocation Detail Modal ───────────────────────────────────────────────────
@@ -1369,7 +1569,7 @@ function closeAllocModal() {
 async function openAllocDetail(type, name) {
   document.getElementById('alloc-modal-title').textContent = name;
   document.getElementById('alloc-modal-sub').textContent =
-    type === 'geo' ? 'Répartition géographique — sources ETF' : 'Répartition sectorielle — sources ETF';
+    type === 'geo' ? t('alloc_modal_geo') : t('alloc_modal_sector');
   document.getElementById('alloc-modal-content').innerHTML = '<div class="loading">Chargement…</div>';
   document.getElementById('alloc-modal-overlay').style.display = 'flex';
 
@@ -1377,7 +1577,7 @@ async function openAllocDetail(type, name) {
 
   if (!data.etfs.length) {
     document.getElementById('alloc-modal-content').innerHTML =
-      '<div class="empty"><p>Aucun ETF ne contribue à cette catégorie.</p></div>';
+      `<div class="empty"><p>${t('alloc_no_etf')}</p></div>`;
     return;
   }
 
@@ -1385,7 +1585,7 @@ async function openAllocDetail(type, name) {
 
   document.getElementById('alloc-modal-content').innerHTML = `
     <p style="color:var(--muted);font-size:12px;margin-bottom:16px">
-      Contribution totale au portefeuille :
+      ${t('alloc_total_contrib')}
       <strong style="color:var(--text);font-family:'DM Mono',monospace">${fmt(totalContrib, 1)}%</strong>
     </p>
     ${data.etfs.map(etf => `
@@ -1398,9 +1598,9 @@ async function openAllocDetail(type, name) {
           <span style="font-family:'DM Mono',monospace;font-weight:600;font-size:15px;color:var(--accent);flex-shrink:0;margin-left:12px">${fmt(etf.contribution, 1)}%</span>
         </div>
         <div style="font-size:11px;color:var(--muted);margin-bottom:${etf.companies.length ? '10px' : '0'}">
-          <span style="font-family:'DM Mono',monospace">${fmt(etf.index_pct, 1)}%</span> dans l'indice
+          <span style="font-family:'DM Mono',monospace">${fmt(etf.index_pct, 1)}%</span> ${t('alloc_in_index')}
           &nbsp;×&nbsp;
-          <span style="font-family:'DM Mono',monospace">${fmt(etf.etf_weight, 1)}%</span> du portefeuille
+          <span style="font-family:'DM Mono',monospace">${fmt(etf.etf_weight, 1)}%</span> ${t('alloc_of_portfolio')}
         </div>
         ${etf.companies.length ? `
           <div style="display:flex;flex-wrap:wrap;gap:5px">
@@ -1435,12 +1635,12 @@ async function openEtfModal(isin) {
   const statsEl = document.getElementById('modal-stats');
   if (pos) {
     statsEl.innerHTML = [
-      { label: 'Parts',       value: pos.shares },
-      { label: 'Px moyen',    value: fmtEur(pos.avg_cost) },
-      { label: 'Investi',     value: fmtEur(pos.total_invested) },
-      { label: 'Valeur act.', value: fmtEur(pos.current_value) },
-      { label: 'Plus-value',  value: fmtEur(pos.gain_abs), cls: pctClass(pos.gain_abs) },
-      { label: 'Perf.',       value: fmtPct(pos.gain_pct), cls: pctClass(pos.gain_pct) },
+      { label: t('mstat_shares'),    value: pos.shares },
+      { label: t('mstat_avg_price'), value: fmtEur(pos.avg_cost) },
+      { label: t('mstat_invested'),  value: fmtEur(pos.total_invested) },
+      { label: t('mstat_value'),     value: fmtEur(pos.current_value) },
+      { label: t('mstat_gain'),      value: fmtEur(pos.gain_abs), cls: pctClass(pos.gain_abs) },
+      { label: t('mstat_perf'),      value: fmtPct(pos.gain_pct), cls: pctClass(pos.gain_pct) },
     ].map(s => `<div class="mstat">
       <span class="mstat-label">${s.label}</span>
       <span class="mstat-value ${s.cls || ''}">${s.value}</span>
@@ -1547,11 +1747,11 @@ async function loadModalChart(period) {
                 const b = buysByLabel[item.label];
                 if (!b) return null;
                 return [
-                  ` ▲ Achat${b.count > 1 ? 's (' + b.count + ')' : ''} — ${b.shares.toFixed(4)} parts`,
-                  `   Prix moy. : ${fmt(b.amount / b.shares, 2)} €   Investi : ${fmt(b.amount, 2)} €`,
+                  ` ▲ ${t('etf_legend_buy')}${b.count > 1 ? 's (' + b.count + ')' : ''} — ${b.shares.toFixed(4)} ${t('buy_shares')}`,
+                  `   ${t('buy_avg')} ${fmt(b.amount / b.shares, 2)} €   ${t('buy_invested')} ${fmt(b.amount, 2)} €`,
                 ];
               }
-              return ` Prix : ${fmt(item.parsed.y, 2)} €`;
+              return ` ${t('tooltip_price')} : ${fmt(item.parsed.y, 2)} €`;
             }
           }
         }
@@ -1586,14 +1786,14 @@ async function warmupServer() {
     if (_importing) return;
     warned = true;
     log.classList.add('visible');
-    logLine('⏳ Réveil du serveur (~30s)… Merci de patienter.');
+    logLine(t('log_warmup'));
   }, 2000);
   try {
     await fetch(`${API}/ping`);
   } catch(e) {}
   finally {
     clearTimeout(warnTimer);
-    if (warned && !_importing) logLine('✓ Serveur prêt.', 'log-ok');
+    if (warned && !_importing) logLine(t('log_server_ready'), 'log-ok');
   }
 }
 
@@ -1602,6 +1802,7 @@ setInterval(() => fetch(`${API}/ping`).catch(() => {}), 10 * 60 * 1000);
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 loadPortfolio();
+setLang(currentLang);
 warmupServer();
 if (PORT.transactions.length) {
   recompute().then(() => show('overview'));
